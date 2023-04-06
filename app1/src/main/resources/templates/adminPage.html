@@ -25,53 +25,155 @@
 
 <nav role='navigation'>
     <ul class="main">
-        <li class="write"><a class="select_a" href="#add_vote">Добавить кандидата</a></li>
-        <li class="users"><a href="#vote" class="select_a">Подсчет голосов</a></li>
+        <li class="write"><a class="select_a" href="#add_hourse">Добавить лошадь</a></li>
+        <li class="users"><a href="#bet" class="select_a">Результаты</a></li>
+        <li class="users"><a href="#add_races" class="select_a">Создать заезд</a></li>
+        <li class="users"><a href="#race" class="select_a">Все заезды</a></li>
     </ul>
 </nav>
 
 <main role="main">
 
-    <section class="panel important select_block show_blocks" id="vote">
-        <h2>Голосование</h2>
+    <section class="panel important select_block show_blocks" id="bet">
+        <h2>Ставки</h2>
 
-        <div class="btn-group flex-wrap fl-radius">
-
-            <div class="card" th:each="candidate : ${candidates}">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${candidate.name}"></h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary"
-                        th:text="${candidate.users.size()} + ' голосов'"></h6>
-                </div>
-            </div>
+        <div class="table-wrapper">
+            <table class="fl-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тип ставки</th>
+                    <th>Сумма</th>
+                    <th>Коэффициент</th>
+                    <th>Заезд</th>
+                    <th>Выигрыш</th>
+                    <th>Пользователь</th>
+                    <th>Результат</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="bet : ${bets}">
+                    <td th:text="${bet.id}"></td>
+                    <td th:text="${bet.betType}"></td>
+                    <td th:text="${bet.amount}"></td>
+                    <td th:text="${bet.coefficient}"></td>
+                    <td th:text="${bet.race.id}"></td>
+                    <td th:text="${bet.amount * bet.coefficient}"></td>
+                    <td th:text="${bet.user.username}"></td>
+                    <td th:text="${bet.result}"></td>
+                </tr>
+                <tbody>
+            </table>
         </div>
 
-            <a class="add_candidate" href="/delete">Закончить голосование</a>
 
-            <a class="add_candidate" href="/winner">Подсчитать результаты</a>
+            <a class="add_candidate" href="/finish">Выплатить ставки за заезд</a>
+
+
+    </section>
+    <section class="panel important select_block hidden" id="race">
+        <h2>Заезды</h2>
+
+        <div class="table-wrapper">
+            <table class="fl-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Победитель</th>
+                    <th>Проигравший</th>
+                    <th>Все лошади</th>
+                    <th>Активность</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="race : ${races}">
+                    <td th:text="${race.id}"></td>
+                    <td th:text="${race.name}"></td>
+                    <td th:text="${race.winner?.name != null ? race.winner.name : ''}"></td>
+                    <td th:text="${race.last?.name != null ? race.last.name : ''}"></td>
+                    <td>
+                        <span th:each="horse : ${race.horses}" th:text="${horse.name} + ' '"></span>
+                    </td>
+                    <td th:text="${race.isActive}"></td>
+                </tr>
+                <tbody>
+            </table>
+        </div>
+
+
+
 
 
     </section>
 
 
-    <section class="panel important select_block hidden" id="add_vote">
-        <h2>Добавить кандидата</h2>
-        <form action="/" method="post">
+    <section class="panel important select_block hidden" id="add_hourse">
+        <h2>Добавить лошадь</h2>
+        <form action="/addHorse" method="post">
+
             <div class="form-group">
-            </div>
-            <div class="form-group">
-                <label class="form-control-label">Добавить кандидата</label>
-                <input type="text" class="form-control" name="candidateName">
+                <label class="form-control-label">Имя</label>
+                <input type="text" class="form-control" name="name">
 
             </div>
-
+            <div class="form-group">
+                <label for="age">Возраст</label>
+                <input type="text" class="form-control" id="age" name="age">
+            </div>
+            <div class="form-group">
+                <label for="wins">Победы</label>
+                <input type="text" class="form-control" id="wins" name="wins">
+            </div>
             <div>
                 <input type="submit" name="submit" value="Save">
             </div>
 
         </form>
+        <div class="table-wrapper">
+            <table class="fl-table">
+                <thead>
+                <tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Возраст</th>
+                    <th>Победы</th>
+                    <th>Заезды</th>
+                </tr>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="horse : ${horses}">
+                    <td th:text="${horse.id}"></td>
+                    <td th:text="${horse.name}"></td>
+                    <td th:text="${horse.age}"></td>
+                    <td th:text="${horse.wins}"></td>
+                    <td th:text="${horse.race}"></td>
+                </tr>
+                <tbody>
+            </table>
+        </div>
+
+    </section>
 
 
+    <section class="panel important select_block hidden" id="add_races">
+        <form method="post" action="/addRace">
+            <div class="form-group">
+                <label for="name">Название</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+
+            <div class="form-group">
+                <label for="horses">Лошади</label>
+                <select class="form-control" id="horses" name="horses" multiple>
+                    <option value="">Выберите лошадь</option>
+                    <option th:each="horse : ${horses}" th:value="${horse.id}" th:text="${horse.name}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить заезд</button>
+        </form>
     </section>
 
 </main>

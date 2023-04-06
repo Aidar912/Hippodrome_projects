@@ -19,7 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    Long id;
 
     @Column(name = "name")
     String name;
@@ -29,6 +29,9 @@ public class User {
 
     @Column(name = "password")
     String password;
+
+    @Column(name = "balance")
+    double balance;
 
     @Builder.Default
     private Boolean enabled=true;

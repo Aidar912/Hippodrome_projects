@@ -8,22 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "candidate")
-@Builder
+@Table(name = "races")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level= AccessLevel.PRIVATE)
-public class Candidate {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Races {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "name")
+    @Column
     String name;
 
-    @OneToMany()
-    List<User> users = new ArrayList<>();
+    @ManyToOne
+    Horse winner;
+
+    @ManyToOne
+    Horse last;
+
+    @ManyToMany
+    List<Horse> horses;
+
+    @Column
+    boolean isActive;
 
 
 }
