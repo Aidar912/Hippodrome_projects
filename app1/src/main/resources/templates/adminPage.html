@@ -67,7 +67,7 @@
         </div>
 
 
-            <a class="add_candidate" href="/finish">Выплатить ставки за заезд</a>
+        <a class="add_candidate" href="/finish">Выплатить ставки за заезд</a>
 
 
     </section>
@@ -102,9 +102,6 @@
         </div>
 
 
-
-
-
     </section>
 
 
@@ -120,10 +117,6 @@
             <div class="form-group">
                 <label for="age">Возраст</label>
                 <input type="text" class="form-control" id="age" name="age">
-            </div>
-            <div class="form-group">
-                <label for="wins">Победы</label>
-                <input type="text" class="form-control" id="wins" name="wins">
             </div>
             <div>
                 <input type="submit" name="submit" value="Save">
@@ -165,14 +158,13 @@
                 <input type="text" class="form-control" id="name" name="name">
             </div>
 
-            <div class="form-group">
-                <label for="horses">Лошади</label>
-                <select class="form-control" id="horses" name="horses" multiple>
-                    <option value="">Выберите лошадь</option>
-                    <option th:each="horse : ${horses}" th:value="${horse.id}" th:text="${horse.name}"></option>
-                </select>
+
+            <div th:each="horse : ${horses}" th:if="${!horse.inTheRace}" class="form-check">
+                <input type="checkbox" class="form-check-input" name="horseIds" th:value="${horse.id}" th:id="'horse-' + ${horse.id}"/>
+                <label th:for="'horse-' + ${horse.id}" class="form-check-label" th:text="${horse.name}"></label>
             </div>
-            <button type="submit" class="btn btn-primary">Добавить заезд</button>
+
+            <button type="submit" class="btn btn-primary mt-3">Добавить заезд</button>
         </form>
     </section>
 

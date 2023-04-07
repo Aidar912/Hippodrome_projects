@@ -7,7 +7,6 @@ import com.example.app1.entities.Horse;
 import com.example.app1.enums.BetType;
 import com.example.app1.enums.Result;
 import com.example.app1.repositories.BetRepository;
-import com.example.app1.repositories.HorseRepository;
 import com.example.app1.repositories.RaceRepository;
 import com.example.app1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class BetService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private HorseRepository horseRepository;
+    private HorseService horseService;
     @Autowired
     private RaceService raceService;
 
@@ -47,19 +46,20 @@ public class BetService {
     public void voteForHourse(Long race_ID, Long user_ID, BetType betType, Integer amount, Double coefficient, Long hourse_Id) {
         Optional<Races> races = raceRepository.findById(race_ID);
         Optional<User> user = userRepository.findById(user_ID);
-        Optional<Horse> horse = horseRepository.findById(hourse_Id);
+        Horse horse = horseService.findById(hourse_Id);
+        horse.setVote(horse.getVote() + 1);
+        horse.setBetSum(horse.getBetSum() + amount);
         Bets bet = Bets.builder()
                 .user(null)
                 .betType(betType)
                 .amount(Double.valueOf(amount))
                 .coefficient(coefficient)
                 .race(null)
-                .horse(null)
+                .horse(horse)
                 .build();
         user.ifPresent(bet::setUser);
         races.ifPresent(bet::setRace);
-        horse.ifPresent(bet::setHorse);
-
+        horseService.save(horse);
         betRepository.save(bet);
 
 
@@ -79,7 +79,11 @@ public class BetService {
                 Horse loser = race.getLast();
                 List<Bets> bets = betRepository.findAll();
                 for (Bets bet : bets) {
+
                     if(bet.getRace().getId() == race.getId()){
+
+
+
                         if (bet.getBetType() == BetType.LAST){
                             if (bet.getHorse() == loser){
                                 userService.getUserById(bet.getUser().getId()).setBalance(userService.getUserById(bet.getUser().getId()).getBalance() + (bet.getCoefficient() * bet.getAmount() *0.1));

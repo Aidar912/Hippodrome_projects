@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="vote_v2@localhost" uuid="a50d029d-45f5-4ea3-9bcd-65bbdc0f1998">
+    <data-source source="LOCAL" name="testDB@localhost" uuid="fe669361-87ee-4729-9521-905b42bba42a">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/vote</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/testDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

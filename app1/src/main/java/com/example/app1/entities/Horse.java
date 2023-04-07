@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "hourse")
+@Table(name = "horse")
 @Builder
 @Data
 @AllArgsConstructor
@@ -21,14 +21,23 @@ public class Horse {
     @Column
     Integer age;
 
-    @Column
+    @Column(columnDefinition = "integer default 0")
     Integer wins;
 
-    @Column(columnDefinition = "1")
+    @Column(columnDefinition = "integer default 0")
     Integer race;
 
     @Column
     String name;
+
+    @Column(columnDefinition = "integer default 0")
+    Integer vote;
+
+    @Column(columnDefinition = "integer default 0")
+    Integer betSum;
+
+    @Column
+    boolean inTheRace;
 
 
 }

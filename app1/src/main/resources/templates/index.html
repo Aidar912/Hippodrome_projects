@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" href="../static/css/index.css" >
     <link rel="stylesheet" th:href="@{/css/index.css}" >
 </head>
 <body>
@@ -89,14 +88,6 @@
                 </option>
             </select>
         </div>
-
-        <div class="form-group">
-            <label for="horse">Horse</label>
-            <select class="form-control" id="horse" name="horse_ID">
-                <option th:each="horse : ${races[0].horses}" th:value="${horse.id}" th:text="${horse.name}">
-                </option>
-            </select>
-        </div>
         <div class="form-group">
             <label for="betType">Bet Type</label>
             <select name="betType" id="betType">
@@ -105,6 +96,16 @@
                         th:text="${type.name()}"></option>
             </select>
         </div>
+        <div class="form-group">
+            <label for="horse">Horse</label>
+            <select class="form-control" id="horse" name="horse_ID">
+                <option th:each="horse : ${races[0].horses}" th:value="${horse.id}"
+                        th:text="${horse.name} + ' - кф ' + ${horseService.calculateCoefficientWin(horse.id)}">
+                </option>
+            </select>
+        </div>
+        <input type="hidden" name="coefficient" id="coefficient">
+
         <div class="form-group">
             <label for="amount">Amount</label>
             <input type="text" class="form-control" id="amount" name="amount">
@@ -151,11 +152,28 @@
     </div>
 </section>
 
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Ошибка!</h4>
+            </div>
+            <div class="modal-body">
+                <p id="alert-message"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:src="@{/js/admin.js}"></script>
-<script src="../static/js/admin.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
 </body>
 </html>

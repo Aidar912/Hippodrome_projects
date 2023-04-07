@@ -73,44 +73,56 @@ public class MainController {
             model.addAttribute("races", race);
             model.addAttribute("horses", horses);
             model.addAttribute("betType", BetType.values());
+            model.addAttribute("horseService",horseService);
             return "index";
         }
     }
 
 
     @PostMapping("/addBet")
-    public String voteForHourse(@RequestParam Long horse_ID,@RequestParam Long raceId, @RequestParam Long userId, @RequestParam BetType betType, @RequestParam Integer amount, Model model) {
+    public String voteForHourse(@RequestParam Long horse_ID, @RequestParam Long raceId, @RequestParam Long userId, @RequestParam BetType betType, @RequestParam Integer amount, @RequestParam double coefficient, Model model) {
         try {
-            if (userService.WithdrawingMoney(amount,userId)){
-                Double win = horseService.calculateCoefficient(horse_ID);
-                betService.voteForHourse(raceId, userId, betType, amount, win, horse_ID);
-                System.out.println("good");
+            if (userService.WithdrawingMoney(amount, userId)) {
+                betService.voteForHourse(raceId, userId, betType, amount, coefficient, horse_ID);
+                return "redirect:/";
+            }else {
+
+                return "redirect:/?message=Недостаточно средств";
             }
-            return "redirect:/";
+
         } catch (Exception e) {
-            System.out.println(e);
-            return "redirect:/";
+
+            return "redirect:/?message=Ошибка.Попробуйте снова!";
         }
     }
 
     @PostMapping("/addHorse")
-    public String addHorse(@RequestParam String name, @RequestParam Integer age, @RequestParam Integer wins) {
+    public String addHorse(@RequestParam String name, @RequestParam Integer age) {
         Horse horse = new Horse();
         horse.setName(name);
         horse.setAge(age);
-        horse.setWins(wins);
+        horse.setWins(0);
+        horse.setRace(0);
+        horse.setVote(0);
         horseService.save(horse);
         return "redirect:/";
     }
 
 
     @PostMapping("/addRace")
-    public String addRace(@RequestParam("name") String name, @RequestParam("horses") List<Long> horseIds) {
+    public String addRace(@RequestParam("name") String name, @RequestParam("horseIds") List<Long> horseIds) {
         List<Horse> horses = horseRepository.findAllById(horseIds);
         Races race = new Races();
         race.setName(name);
         race.setHorses(horses);
         race.setActive(true);
+
+        for (Horse horse: horses) {
+            horse.setInTheRace(true);
+            horse.setRace(horse.getRace() + 1);
+            horseRepository.save(horse);
+        }
+
 
         raceRepository.save(race);
 
@@ -130,28 +142,43 @@ public class MainController {
         }
         Horse winner = horses.get(winnerIndex);
         Horse last = horses.get(lastIndex);
-        winner.setWins(winner.getWins()+1);
-        for (Horse horse : horses) {
-            horse.setRace(horse.getRace() + 1);
-        }
+        winner.setWins(winner.getWins() + 1);
         race.setWinner(winner);
         race.setLast(last);
         betService.FinishFirstRace();
+
+        for (Horse horse : race.getHorses()) {
+            horse.setInTheRace(false);
+            horse.setVote(0);
+            horse.setBetSum(0);
+
+            horseRepository.save(horse);
+        }
 
         return "redirect:/";
     }
 
 
-    @PostMapping("/")
+    @PostMapping("/horses")
     @ResponseBody
     public List<Horse> getHorsesForRace(@RequestParam("raceId") Long raceId) {
-        List<Horse> horses = horseService.getHorsesForRace(raceId);
+        return horseService.getHorsesForRace(raceId);
+    }
 
-        return horses;
+    @PostMapping("/coefficient/win")
+    @ResponseBody
+    public Double calculateCoefficientWin(@RequestParam("horseId") Long horseId) {
+        return horseService.calculateCoefficientWin(horseId);
+    }
+
+    @PostMapping("/coefficient/lose")
+    @ResponseBody
+    public Double calculateCoefficientLose(@RequestParam("horseId") Long horseId) {
+        return horseService.calculateCoefficientLose(horseId);
     }
 
     @PostMapping("/changebalance")
-    public String changeBalance(@RequestParam double balance , @RequestParam Long userId){
+    public String changeBalance(@RequestParam double balance, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
         user.setBalance(user.getBalance() + balance);
         userRepository.save(user);

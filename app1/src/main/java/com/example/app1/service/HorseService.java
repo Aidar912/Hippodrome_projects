@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HorseService {
+
+    private static final double BASE_COEFFICIENT = 1.5;
 
     @Autowired
     HorseRepository horseRepository;
@@ -20,14 +21,14 @@ public class HorseService {
     RaceRepository raceRepository;
 
 
-
-    public void save(Horse Horse){
+    public void save(Horse Horse) {
         horseRepository.save(Horse);
     }
 
-    public Optional<Horse> findById(Long id){
-        return horseRepository.findById(id);
+    public Horse findById(Long id) {
+        return horseRepository.findById(id).orElse(null);
     }
+
     public List<Horse> getAllHorse() {
         return horseRepository.findAll();
     }
@@ -36,12 +37,56 @@ public class HorseService {
         horseRepository.deleteAll();
     }
 
-    public double calculateCoefficient(Long id) {
-        Optional<Horse> horse = horseRepository.findById(id);
-        double winRate = (double) horse.get().getWins() / horse.get().getRace();
-        double ageFactor = 1.0 + ((double) horse.get().getAge() / 10.0); // увеличиваем коэффициент с возрастом лошади
-        double coefficient = winRate * ageFactor;
-        return coefficient < 1 ? 1 : coefficient;
+    public double calculateCoefficientWin(Long id) {
+        Horse horse = horseRepository.findById(id).orElse(null);
+
+        double coefficient = 1.0;
+
+        assert horse != null;
+        coefficient += 0.1 * horse.getWins();
+
+
+        coefficient += 0.01 * horse.getRace();
+
+        coefficient += 0.001 * horse.getVote();
+
+        coefficient += 0.0001 * horse.getBetSum();
+
+        coefficient -= 0.05 *horse.getAge();
+
+        if (coefficient < 1.0) {
+            coefficient = 1.0;
+        }
+
+        return coefficient;
+    }
+
+    public double calculateCoefficientLose(Long id) {
+        Horse horse = horseRepository.findById(id).orElse(null);
+
+
+        double coefficient = 1.0;
+
+        assert horse != null;
+        coefficient += 0.05 * (horse.getRace() - horse.getWins());
+
+        coefficient += 0.01 * horse.getRace();
+
+
+        coefficient += 0.001 * horse.getVote();
+
+
+        coefficient += 0.0001 * horse.getBetSum();
+
+
+        coefficient -= 0.05 * horse.getAge();
+
+
+        if (coefficient < 1.0) {
+            coefficient = 1.0;
+        }
+
+        return coefficient;
     }
 
 
